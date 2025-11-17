@@ -1,5 +1,5 @@
 // ======================
-// DRINK LIST
+// DRINK LIST (STATIC)
 // ======================
 const drinks = [
   { name: "Espresso", price: 1.50 },
@@ -16,17 +16,68 @@ const drinks = [
 ];
 
 // ======================
-// TABLE DATA
+// STATE (WITH LOCAL STORAGE)
 // ======================
-let tables = [
-  { id: 1, name: "Table 1", orderLines: [] },
-  { id: 2, name: "Table 2", orderLines: [] },
-  { id: 3, name: "Table 3", orderLines: [] },
-  { id: 4, name: "Bar",     orderLines: [] }
-];
+const STORAGE_KEY = "drinks-tab-state-v1";
 
+let tables = [];
 let currentTableId = 1;
-let nextTableId = 5;
+let nextTableId = 1;
+
+// Load state from localStorage if available
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      resetStateToDefault();
+      return;
+    }
+
+    const saved = JSON.parse(raw);
+
+    tables = saved.tables || [];
+    currentTableId = saved.currentTableId || 1;
+    nextTableId = saved.nextTableId || 5;
+
+    if (tables.length === 0) {
+      resetStateToDefault();
+    }
+  } catch (e) {
+    console.error("Error loading state. Resetting to default.", e);
+    resetStateToDefault();
+  }
+}
+
+// Default tables setup
+function resetStateToDefault() {
+  tables = [
+    { id: 1, name: "Table 1", orderLines: [] },
+    { id: 2, name: "Table 2", orderLines: [] },
+    { id: 3, name: "Table 3", orderLines: [] },
+    { id: 4, name: "Bar",     orderLines: [] }
+  ];
+  currentTableId = 1;
+  nextTableId = 5;
+  saveState();
+}
+
+// Save to localStorage
+function saveState() {
+  const data = {
+    tables,
+    currentTableId,
+    nextTableId
+  };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error("Error saving state:", e);
+  }
+}
+
+function getCurrentTable() {
+  return tables.find(t => t.id === currentTableId) || tables[0];
+}
 
 // ======================
 // DOM ELEMENTS
@@ -36,13 +87,10 @@ const orderBody = document.getElementById("orderBody");
 const totalAmountEl = document.getElementById("totalAmount");
 const clearOrderBtn = document.getElementById("clearOrder");
 const chargeOrderBtn = document.getElementById("chargeOrder");
+const resetAllBtn = document.getElementById("resetAll");
 const tableNameInput = document.getElementById("tableNameInput");
 const tablesTabsContainer = document.getElementById("tablesTabs");
 const addTableBtn = document.getElementById("addTableBtn");
-
-function getCurrentTable() {
-  return tables.find(t => t.id === currentTableId);
-}
 
 // ======================
 // RENDER DRINK BUTTONS
@@ -132,11 +180,14 @@ function renderOrderTable() {
 // CALCULATE TOTAL
 // ======================
 function calculateTotal(table) {
-  return table.orderLines.reduce((sum, line) => sum + line.price * line.quantity, 0);
+  return table.orderLines.reduce(
+    (sum, line) => sum + line.price * line.quantity,
+    0
+  );
 }
 
 // ======================
-// ADD DRINK
+// ACTIONS
 // ======================
 function addDrinkToTable(drink) {
   const table = getCurrentTable();
@@ -151,25 +202,18 @@ function addDrinkToTable(drink) {
       quantity: 1
     });
   }
-
   updateUI();
 }
 
-// ======================
-// CLEAR TABLE
-// ======================
 clearOrderBtn.addEventListener("click", () => {
   const table = getCurrentTable();
   if (table.orderLines.length === 0) return;
-  if (confirm(`Clear order for ${table.name}?`)) {
-    table.orderLines = [];
-    updateUI();
-  }
+  if (!confirm(`Clear order for ${table.name}?`)) return;
+
+  table.orderLines = [];
+  updateUI();
 });
 
-// ======================
-// CHARGE TABLE
-// ======================
 chargeOrderBtn.addEventListener("click", () => {
   const table = getCurrentTable();
   const total = calculateTotal(table);
@@ -192,17 +236,24 @@ chargeOrderBtn.addEventListener("click", () => {
 });
 
 // ======================
-// RENAME TABLE
+// RESET ALL DATA
 // ======================
+resetAllBtn.addEventListener("click", () => {
+  if (!confirm("Are you sure? This will clear ALL tables, orders, and names!")) return;
+
+  localStorage.removeItem(STORAGE_KEY);
+  resetStateToDefault();
+  updateUI();
+});
+
+// RENAME TABLE
 tableNameInput.addEventListener("input", () => {
   const table = getCurrentTable();
   table.name = tableNameInput.value || "Unnamed table";
-  renderTableTabs();
+  updateUI();
 });
 
-// ======================
 // ADD NEW TABLE
-// ======================
 addTableBtn.addEventListener("click", () => {
   const newTable = {
     id: nextTableId,
@@ -216,15 +267,17 @@ addTableBtn.addEventListener("click", () => {
 });
 
 // ======================
-// UPDATE UI
+// MAIN UI UPDATE
 // ======================
 function updateUI() {
   renderTableTabs();
   renderOrderTable();
+  saveState(); // persist changes
 }
 
 // ======================
 // INIT
 // ======================
+loadState();
 renderDrinkButtons();
 updateUI();
