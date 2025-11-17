@@ -15,60 +15,63 @@ const drinks = [
   { name: "Water 0.5L", price: 1.20 }
 ];
 
-// ======================
-// STATE (WITH LOCAL STORAGE)
-// ======================
 const STORAGE_KEY = "drinks-tab-state-v1";
 
+// ======================
+// STATE
+// ======================
 let tables = [];
 let currentTableId = 1;
 let nextTableId = 1;
 
-// Load state from localStorage if available
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      resetStateToDefault();
-      return;
-    }
-
-    const saved = JSON.parse(raw);
-
-    tables = saved.tables || [];
-    currentTableId = saved.currentTableId || 1;
-    nextTableId = saved.nextTableId || 5;
-
-    if (tables.length === 0) {
-      resetStateToDefault();
-    }
-  } catch (e) {
-    console.error("Error loading state. Resetting to default.", e);
-    resetStateToDefault();
-  }
-}
-
-// Default tables setup
-function resetStateToDefault() {
-  tables = [
+// ---------- default state ----------
+function defaultTables() {
+  return [
     { id: 1, name: "Table 1", orderLines: [] },
     { id: 2, name: "Table 2", orderLines: [] },
     { id: 3, name: "Table 3", orderLines: [] },
     { id: 4, name: "Bar",     orderLines: [] }
   ];
-  currentTableId = 1;
-  nextTableId = 5;
-  saveState();
 }
 
-// Save to localStorage
-function saveState() {
-  const data = {
-    tables,
-    currentTableId,
-    nextTableId
-  };
+// ---------- load from localStorage ----------
+function loadState() {
   try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      tables = defaultTables();
+      currentTableId = 1;
+      nextTableId = 5;
+      return;
+    }
+
+    const saved = JSON.parse(raw);
+    if (!saved || !Array.isArray(saved.tables) || saved.tables.length === 0) {
+      tables = defaultTables();
+      currentTableId = 1;
+      nextTableId = 5;
+      return;
+    }
+
+    tables = saved.tables;
+    currentTableId = saved.currentTableId || tables[0].id;
+    nextTableId = saved.nextTableId || (Math.max(...tables.map(t => t.id)) + 1);
+  } catch (e) {
+    console.error("Error loading state, using defaults:", e);
+    tables = defaultTables();
+    currentTableId = 1;
+    nextTableId = 5;
+  }
+}
+
+// ---------- save to localStorage ----------
+function saveState() {
+  try {
+    const data = {
+      tables,
+      currentTableId,
+      nextTableId
+    };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
     console.error("Error saving state:", e);
@@ -87,10 +90,12 @@ const orderBody = document.getElementById("orderBody");
 const totalAmountEl = document.getElementById("totalAmount");
 const clearOrderBtn = document.getElementById("clearOrder");
 const chargeOrderBtn = document.getElementById("chargeOrder");
-const resetAllBtn = document.getElementById("resetAll");
 const tableNameInput = document.getElementById("tableNameInput");
 const tablesTabsContainer = document.getElementById("tablesTabs");
 const addTableBtn = document.getElementById("addTableBtn");
+
+// Reset All button is optional in HTML
+const resetAllBtn = document.getElementById("resetAll");
 
 // ======================
 // RENDER DRINK BUTTONS
@@ -235,25 +240,14 @@ chargeOrderBtn.addEventListener("click", () => {
   updateUI();
 });
 
-// ======================
-// RESET ALL DATA
-// ======================
-resetAllBtn.addEventListener("click", () => {
-  if (!confirm("Are you sure? This will clear ALL tables, orders, and names!")) return;
-
-  localStorage.removeItem(STORAGE_KEY);
-  resetStateToDefault();
-  updateUI();
-});
-
-// RENAME TABLE
+// rename table
 tableNameInput.addEventListener("input", () => {
   const table = getCurrentTable();
   table.name = tableNameInput.value || "Unnamed table";
   updateUI();
 });
 
-// ADD NEW TABLE
+// add new table
 addTableBtn.addEventListener("click", () => {
   const newTable = {
     id: nextTableId,
@@ -266,13 +260,25 @@ addTableBtn.addEventListener("click", () => {
   updateUI();
 });
 
+// optional: reset all data (if button exists in HTML)
+if (resetAllBtn) {
+  resetAllBtn.addEventListener("click", () => {
+    if (!confirm("Are you sure? This will clear ALL tables, orders and names.")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    tables = defaultTables();
+    currentTableId = 1;
+    nextTableId = 5;
+    updateUI();
+  });
+}
+
 // ======================
 // MAIN UI UPDATE
 // ======================
 function updateUI() {
   renderTableTabs();
   renderOrderTable();
-  saveState(); // persist changes
+  saveState(); // persist after every change
 }
 
 // ======================
