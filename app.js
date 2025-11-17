@@ -2,8 +2,8 @@
 // DRINK LIST (STATIC)
 // ======================
 const drinks = [
-  { name: "Espresso", price: 1.50 },
-  { name: "Macchiato", price: 1.80 },
+  { name: "Radenska", price: 1.50 },
+  { name: "Voda", price: 1.80 },
   { name: "Cappuccino", price: 2.20 },
   { name: "Latte", price: 2.50 },
   { name: "Tea", price: 1.80 },
@@ -27,10 +27,10 @@ let nextTableId = 1;
 // ---------- default state ----------
 function defaultTables() {
   return [
-    { id: 1, name: "Table 1", orderLines: [] },
-    { id: 2, name: "Table 2", orderLines: [] },
-    { id: 3, name: "Table 3", orderLines: [] },
-    { id: 4, name: "Bar",     orderLines: [] }
+    { id: 1, name: "Miza 1", orderLines: [] },
+    { id: 2, name: "Miza 2", orderLines: [] },
+    { id: 3, name: "Miza 3", orderLines: [] },
+    { id: 4, name: "Miza 4",     orderLines: [] }
   ];
 }
 
