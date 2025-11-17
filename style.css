@@ -154,6 +154,22 @@ section h2 {
   justify-content: space-between;
   align-items: center;
   margin-top: 8px;
+  flex-wrap: nowrap;  /* prevent breaking into new lines */
+  gap: 12px;
+}
+
+.total {
+  white-space: nowrap;  /* keep "Skupaj: 0.00 €" in one line */
+}
+
+.actions {
+  display: flex;
+  flex-wrap: nowrap;     /* buttons stay in one row */
+  gap: 8px;              /* spacing between buttons */
+}
+
+.actions button {
+  white-space: nowrap;    /* prevent buttons text from breaking */
 }
 
 .total {
