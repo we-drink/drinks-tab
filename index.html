@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bar POS System</title>
+  <title>Računamo</title>
 
   <!-- Link CSS -->
   <link rel="stylesheet" href="style.css" />
@@ -11,7 +11,7 @@
 
 <body>
   <div class="app">
-    <h1>Bar Order System</h1>
+    <h1>Kolko je kdo dužn?</h1>
 
     <!-- TABLE TABS -->
     <div class="tables-tabs">
@@ -31,21 +31,21 @@
     <div class="layout">
       <!-- DRINK LIST -->
       <section class="drinks">
-        <h2>Drinks</h2>
+        <h2>Pijače</h2>
         <div id="drinkButtons" class="drink-buttons"></div>
       </section>
 
       <!-- ORDER -->
       <section class="order">
-        <h2>Current Order</h2>
+        <h2>Trenutno naročilo</h2>
 
         <table>
           <thead>
             <tr>
-              <th>Drink</th>
-              <th>Qty</th>
-              <th>Price (€)</th>
-              <th>Subtotal (€)</th>
+              <th>Pijača</th>
+              <th>Kol.</th>
+              <th>Cena (€)</th>
+              <th>Skupaj (€)</th>
               <th></th>
             </tr>
           </thead>
@@ -54,12 +54,12 @@
 
         <div class="order-footer">
           <div class="total">
-            Total: <span id="totalAmount">0.00</span> €
+            Skupaj: <span id="totalAmount">0.00</span> €
           </div>
           <div class="actions">
-  <button id="clearOrder">Clear</button>
-  <button id="chargeOrder">Charge / Print Bill</button>
-  <button id="resetAll" style="background:#ff4d4d;color:white;">Reset All</button>
+  <button id="clearOrder">Počisti</button>
+  <button id="chargeOrder">Poračunaj</button>
+  <button id="resetAll" style="background:#ff4d4d;color:white;">Pobriši podatke</button>
 </div>
         </div>
       </section>
