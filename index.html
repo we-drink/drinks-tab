@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bar POS System</title>
+
+  <!-- Link CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app">
+    <h1>Bar Order System</h1>
+
+    <!-- TABLE TABS -->
+    <div class="tables-tabs">
+      <div id="tablesTabs" class="tables-tabs-list"></div>
+      <button id="addTableBtn" class="add-table-btn">+ Add table</button>
+    </div>
+
+    <!-- TABLE NAME -->
+    <div class="top-bar">
+      <label>
+        Table name:
+        <input type="text" id="tableNameInput" value="">
+      </label>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
+      <!-- DRINK LIST -->
+      <section class="drinks">
+        <h2>Drinks</h2>
+        <div id="drinkButtons" class="drink-buttons"></div>
+      </section>
+
+      <!-- ORDER -->
+      <section class="order">
+        <h2>Current Order</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Drink</th>
+              <th>Qty</th>
+              <th>Price (€)</th>
+              <th>Subtotal (€)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="orderBody"></tbody>
+        </table>
+
+        <div class="order-footer">
+          <div class="total">
+            Total: <span id="totalAmount">0.00</span> €
+          </div>
+          <div class="actions">
+            <button id="clearOrder">Clear</button>
+            <button id="chargeOrder">Charge / Print Bill</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Link JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>
